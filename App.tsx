@@ -47,12 +47,8 @@ const Landing: React.FC<{ onStart: () => void }> = ({ onStart }) => (
 );
 
 const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage: number }> = ({ onAnalyze, remainingUsage }) => {
-  const [code, setCode] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [isValidCode, setIsValidCode] = useState(false);
-  const [showCodeModal, setShowCodeModal] = useState(true);
-  const [error, setError] = useState('');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,16 +65,6 @@ const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage:
     }
   };
 
-  const handleVerifyCode = () => {
-    if (code.length === 8) {
-      setIsValidCode(true);
-      setShowCodeModal(false);
-      setError('');
-    } else {
-      setError('请输入有效的8位兑换码');
-    }
-  };
-
   const handleAnalyzeClick = () => {
     if (file) {
       onAnalyze(file);
@@ -87,33 +73,6 @@ const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage:
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#FDFBF7]">
-      
-      {/* Code Verification Modal Overlay */}
-      {showCodeModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fade-in-up">
-            <h3 className="text-2xl font-bold text-center mb-2">输入兑换码</h3>
-            <p className="text-gray-500 text-center mb-6 text-sm">请输入8位测试兑换码以开启您的色彩之旅</p>
-            <input 
-              type="text" 
-              maxLength={8}
-              placeholder="XXXXXXXX"
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              className="w-full text-center text-2xl tracking-widest border-2 border-gray-200 rounded-xl py-4 mb-4 focus:border-amber-400 focus:outline-none transition-colors"
-            />
-            {error && <p className="text-red-500 text-center text-sm mb-4">{error}</p>}
-            <button 
-              onClick={handleVerifyCode}
-              disabled={code.length !== 8}
-              className="w-full bg-amber-400 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-4 rounded-xl shadow-md hover:bg-amber-500 transition-all"
-            >
-              验证并开始
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="w-full max-w-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">上传您的照片</h2>
         
