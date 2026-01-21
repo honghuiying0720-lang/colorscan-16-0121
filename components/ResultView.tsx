@@ -91,17 +91,17 @@ const PaletteCard: React.FC<{ title: string; items: ColorRecommendation[]; type:
     <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${type === 'recommend' ? 'text-gray-800' : 'text-gray-800'}`}>
        {type === 'recommend' ? '✨ 最适合的推荐色' : '⚠️ 应避开的雷区色'}
     </h3>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
       {items.map((item, idx) => (
-        <div key={idx} className="bg-gray-50 rounded-lg p-4 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+        <div key={idx} className="bg-gray-50 rounded-lg p-3 flex flex-col items-center gap-2 hover:shadow-md transition-shadow">
             <div 
-                className="w-20 h-20 rounded-full shadow-inner border-2 border-white"
+                className="w-16 h-16 rounded-full shadow-inner border-2 border-white"
                 style={{ backgroundColor: item.hex }}
             ></div>
-            <div className="text-center">
-                <p className="text-sm font-medium text-gray-700">{item.name}</p>
-                <p className="text-xs text-gray-400 uppercase tracking-wider font-mono mb-2">{item.hex}</p>
-                <p className="text-xs text-gray-500 line-clamp-2">
+            <div className="text-center w-full">
+                <p className="text-xs font-medium text-gray-700">{item.name}</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-mono mb-1">{item.hex}</p>
+                <p className="text-[10px] text-gray-500 line-clamp-2">
                     {type === 'recommend' ? item.description : item.reason}
                 </p>
             </div>
