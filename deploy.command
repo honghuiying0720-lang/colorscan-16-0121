@@ -61,36 +61,12 @@ if [ $? -eq 0 ]; then
     
     # 上传文件到服务器
     echo "正在上传文件到服务器..."
+    echo "请输入服务器密码: 87368890Hxd"
+    echo "正在执行: scp -r dist/* root@8.134.98.247:/www/wwwroot/xindeh.xyz/colorscan16/"
     
-    # 创建一个临时文件来存储 expect 的退出状态
-    EXPECT_STATUS_FILE=$(mktemp)
-    
-    # 使用 expect 自动输入密码
-    if command -v expect &> /dev/null; then
-        expect << EOF > $EXPECT_STATUS_FILE
-        spawn scp -r dist/* root@8.134.98.247:/www/wwwroot/xindeh.xyz/colorscan16/
-        expect {
-            "password:" {
-                send "87368890Hxd\r"
-                expect {
-                    "Permission denied" {
-                        exit 1
-                    }
-                    eof
-                }
-            }
-            eof
-        }
-EOF
-        # 读取 expect 的退出状态
-        UPLOAD_STATUS=$(cat $EXPECT_STATUS_FILE | tail -n 1)
-        rm $EXPECT_STATUS_FILE
-    else
-        # 如果没有安装 expect，使用手动输入方式
-        echo "系统未安装 expect 命令，请手动输入密码..."
-        scp -r dist/* root@8.134.98.247:/www/wwwroot/xindeh.xyz/colorscan16/
-        UPLOAD_STATUS=$?
-    fi
+    # 直接执行 scp 命令，让用户手动输入密码
+    scp -r dist/* root@8.134.98.247:/www/wwwroot/xindeh.xyz/colorscan16/
+    UPLOAD_STATUS=$?
     
     # 检查上传是否成功
     if [ "$UPLOAD_STATUS" = "0" ] || [ -z "$UPLOAD_STATUS" ]; then
