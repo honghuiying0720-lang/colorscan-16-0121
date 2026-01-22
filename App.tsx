@@ -230,16 +230,7 @@ const LoadingScreen: React.FC<{ onTimeout: () => void }> = ({ onTimeout }) => {
     );
 };
 
-const AppLoading: React.FC = () => (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDFBF7]">
-        <div className="relative w-24 h-24 mb-6">
-             <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
-             <div className="absolute inset-0 border-4 border-amber-400 rounded-full border-t-transparent animate-spin"></div>
-        </div>
-        <h2 className="text-xl font-bold text-gray-800 mb-2">正在加载 ColorScan 16...</h2>
-        <p className="text-gray-500 text-sm">请稍候，我们正在准备您的个性化色彩分析</p>
-    </div>
-);
+
 
 // --- Main App Component ---
 
@@ -279,17 +270,6 @@ const App: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [usageInfo, setUsageInfo] = useState<{ canUse: boolean; remaining: number }>(checkAndUpdateUsage);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // 组件挂载后设置加载状态为 false
-  useEffect(() => {
-    // 给一个小延迟，确保加载动画能够显示
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleStart = () => {
     setStep('upload');
@@ -364,29 +344,25 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] font-sans">
-      {isLoading ? (
-        <AppLoading />
-      ) : (
-        <>
-          {step === 'landing' && <Landing onStart={handleStart} />}
-          {step === 'upload' && (
-            <>
-                {error && (
-                    <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
-                        <div className="bg-red-50 text-red-600 px-6 py-3 rounded-full shadow-lg text-sm font-medium border border-red-100">
-                            {error}
-                        </div>
-                    </div>
-                )}
-                <UploadSection onAnalyze={handleAnalyze} remainingUsage={usageInfo.remaining} />
-            </>
-          )}
-          {step === 'analyzing' && <LoadingScreen onTimeout={handleAnalysisTimeout} />}
-          {step === 'result' && result && (
-            <ResultView result={result} userImage={userImage} onReset={handleReset} />
-          )}
-        </>
-      )}
+      <>
+        {step === 'landing' && <Landing onStart={handleStart} />}
+        {step === 'upload' && (
+          <>
+              {error && (
+                  <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
+                      <div className="bg-red-50 text-red-600 px-6 py-3 rounded-full shadow-lg text-sm font-medium border border-red-100">
+                          {error}
+                      </div>
+                  </div>
+              )}
+              <UploadSection onAnalyze={handleAnalyze} remainingUsage={usageInfo.remaining} />
+          </>
+        )}
+        {step === 'analyzing' && <LoadingScreen onTimeout={handleAnalysisTimeout} />}
+        {step === 'result' && result && (
+          <ResultView result={result} userImage={userImage} onReset={handleReset} />
+        )}
+      </>
     </div>
   );
 };
