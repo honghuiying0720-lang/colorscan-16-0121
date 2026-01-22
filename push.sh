@@ -2,12 +2,13 @@
 
 # 设置Git配置以确保推送成功
 git config --global http.sslVerify false
-git config --global http.proxy ''
-git config --global https.proxy ''
+git config --global http.proxy 'http://127.0.0.1:17890'
+git config --global https.proxy 'http://127.0.0.1:17890'
 git config --global core.compression 0
 
 # 执行推送
 echo "正在推送更改到GitHub..."
+echo "使用代理: http://127.0.0.1:17890"
 git push
 
 # 检查推送结果
