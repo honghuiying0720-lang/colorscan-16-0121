@@ -60,24 +60,40 @@ if [ $? -eq 0 ]; then
     echo "✅ 构建成功！"
     
     # 上传文件到服务器
-echo "正在上传文件到服务器..."
-
-# 使用 expect 自动输入密码
+    echo "正在上传文件到服务器..."
+    
+    # 创建一个临时文件来存储 expect 的退出状态
+    EXPECT_STATUS_FILE=$(mktemp)
+    
+    # 使用 expect 自动输入密码
     if command -v expect &> /dev/null; then
-        expect << EOF
+        expect << EOF > $EXPECT_STATUS_FILE
         spawn scp -r dist/* root@8.134.98.247:/www/wwwroot/xindeh.xyz/colorscan16/
-        expect "password:"
-        send "87368890Hxd\r"
-        expect eof
+        expect {
+            "password:" {
+                send "87368890Hxd\r"
+                expect {
+                    "Permission denied" {
+                        exit 1
+                    }
+                    eof
+                }
+            }
+            eof
+        }
 EOF
+        # 读取 expect 的退出状态
+        UPLOAD_STATUS=$(cat $EXPECT_STATUS_FILE | tail -n 1)
+        rm $EXPECT_STATUS_FILE
     else
         # 如果没有安装 expect，使用手动输入方式
         echo "系统未安装 expect 命令，请手动输入密码..."
         scp -r dist/* root@8.134.98.247:/www/wwwroot/xindeh.xyz/colorscan16/
+        UPLOAD_STATUS=$?
     fi
     
     # 检查上传是否成功
-    if [ $? -eq 0 ]; then
+    if [ "$UPLOAD_STATUS" = "0" ] || [ -z "$UPLOAD_STATUS" ]; then
         echo "✅ 上传成功！"
         echo "========================================"
         echo "   部署完成！"
@@ -85,6 +101,12 @@ EOF
         echo "========================================"
     else
         echo "❌ 上传失败，请检查服务器连接和密码"
+        
+        # 等待用户按回车退出
+        echo ""
+        echo "按回车键退出..."
+        read -r
+        exit 1
     fi
 else
     echo "❌ 构建失败，请检查代码错误"
