@@ -5,46 +5,96 @@ import ResultView from './components/ResultView';
 
 // --- Sub-components for Landing, Upload, Loading ---
 
-const Landing: React.FC<{ onStart: () => void }> = ({ onStart }) => (
-  <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-full h-full -z-10 bg-[#FDFBF7]">
-         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-200 rounded-full blur-[100px] opacity-30"></div>
-         <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-yellow-200 rounded-full blur-[100px] opacity-30"></div>
-    </div>
+const Landing: React.FC<{ onStart: () => void }> = ({ onStart }) => {
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+
+  // 验证验证码格式：8位，2、3、5位为数字，其他为字母
+  const validateVerificationCode = (code: string): boolean => {
+    if (code.length !== 8) {
+      return false;
+    }
     
-    <div className="mb-8 relative">
-        <div className="w-24 h-24 bg-gradient-to-tr from-pink-400 to-yellow-400 rounded-2xl mx-auto rotate-3 shadow-xl flex items-center justify-center text-4xl">
-            ✨
+    // 第2、3、5位必须是数字（索引为1、2、4）
+    const digitPositions = [1, 2, 4];
+    for (let i = 0; i < 8; i++) {
+      const char = code[i];
+      if (digitPositions.includes(i)) {
+        // 必须是数字
+        if (!/\d/.test(char)) {
+          return false;
+        }
+      } else {
+        // 必须是字母
+        if (!/[a-zA-Z]/.test(char)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  const handleVerifyClick = () => {
+    if (validateVerificationCode(verificationCode)) {
+      setVerificationError('');
+      onStart();
+    } else {
+      setVerificationError('验证码不正确，请检查后重新输入');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full -z-10 bg-[#FDFBF7]">
+           <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-200 rounded-full blur-[100px] opacity-30"></div>
+           <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-yellow-200 rounded-full blur-[100px] opacity-30"></div>
+      </div>
+      
+      <div className="mb-8 relative">
+          <div className="w-24 h-24 bg-gradient-to-tr from-pink-400 to-yellow-400 rounded-2xl mx-auto rotate-3 shadow-xl flex items-center justify-center text-4xl">
+              ✨
+          </div>
+      </div>
+      
+      <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 tracking-tight">
+        ColorScan <span className="text-amber-500">16</span>
+      </h1>
+      <h2 className="text-xl md:text-2xl font-light text-gray-600 mb-8">
+        请输入8位兑换码
+      </h2>
+
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+          <div className="mb-6">
+            <input
+              type="text"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+              placeholder="请输入兑换码"
+              className="w-full px-6 py-4 border border-gray-300 rounded-xl text-center text-lg font-medium"
+              maxLength={8}
+            />
+          </div>
+
+          {verificationError && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6">
+              {verificationError}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={handleVerifyClick}
+              className="bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-gray-800 transition-all transform active:scale-95"
+            >
+              验证
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-    
-    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 tracking-tight">
-      ColorScan <span className="text-amber-500">16</span>
-    </h1>
-    <h2 className="text-xl md:text-2xl font-light text-gray-600 mb-8">
-      找到属于你的专属天命色彩
-    </h2>
-    <p className="max-w-md text-gray-500 mb-12 leading-relaxed">
-      不论你是买衣服总是踩雷，还是妆容显脏？<br/>
-      AI 智能分析 16 型四季色彩，为您量身定制<br/>
-      <span className="font-semibold text-gray-700">穿搭方案</span> 与 <span className="font-semibold text-gray-700">妆容建议</span>。
-    </p>
-
-    <div className="grid grid-cols-4 gap-2 mb-12 max-w-sm w-full opacity-80">
-        <div className="h-12 bg-green-200 rounded-lg"></div>
-        <div className="h-12 bg-blue-200 rounded-lg"></div>
-        <div className="h-12 bg-orange-200 rounded-lg"></div>
-        <div className="h-12 bg-purple-200 rounded-lg"></div>
-    </div>
-
-    <button 
-      onClick={onStart}
-      className="bg-gray-900 text-white text-lg font-bold py-4 px-16 rounded-full shadow-xl hover:bg-gray-800 transform transition hover:scale-105 active:scale-95"
-    >
-      开始测试
-    </button>
-  </div>
-);
+  );
+};
 
 const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage: number }> = ({ onAnalyze, remainingUsage }) => {
   const [file, setFile] = useState<File | null>(null);
