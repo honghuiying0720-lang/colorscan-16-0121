@@ -10,7 +10,13 @@ const Landing: React.FC<{ onStart: () => void }> = ({ onStart }) => {
   const [verificationError, setVerificationError] = useState('');
 
   // 验证验证码格式：8位，2、3、5位为数字，其他为字母
+  // 或者特殊兑换码 88888888
   const validateVerificationCode = (code: string): boolean => {
+    // 特殊兑换码
+    if (code === '88888888') {
+      return true;
+    }
+
     if (code.length !== 8) {
       return false;
     }
