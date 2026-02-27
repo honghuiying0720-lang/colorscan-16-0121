@@ -61,14 +61,20 @@ if [ $? -eq 0 ]; then
     
     # 上传文件到服务器
     echo "正在上传文件到服务器..."
-    echo "正在执行: scp -r dist/* root@106.53.97.2:/www/wwwroot/xindeh.xyz/colorscan16/"
-    
+    echo "正在执行: scp -r -o StrictHostKeyChecking=no dist/* root@106.53.97.2:/www/wwwroot/xindeh.xyz/colorscan16/"
+
     # 使用 expect 自动输入密码
     if command -v expect &> /dev/null; then
         expect << EOF
-        spawn scp -r dist/* root@106.53.97.2:/www/wwwroot/xindeh.xyz/colorscan16/
-        expect "password:" {
-            send "873868890.Hxd\r"
+        spawn scp -r -o StrictHostKeyChecking=no dist/* root@106.53.97.2:/www/wwwroot/xindeh.xyz/colorscan16/
+        expect {
+            "password:" {
+                send "873868890.Hxd\r"
+            }
+            "Are you sure you want to continue connecting" {
+                send "yes\r"
+                exp_continue
+            }
         }
         expect eof
 EOF
@@ -76,7 +82,7 @@ EOF
     else
         # 如果没有安装 expect，使用手动输入方式
         echo "系统未安装 expect 命令，请手动输入密码..."
-        scp -r dist/* root@106.53.97.2:/www/wwwroot/xindeh.xyz/colorscan16/
+        scp -r -o StrictHostKeyChecking=no dist/* root@106.53.97.2:/www/wwwroot/xindeh.xyz/colorscan16/
         UPLOAD_STATUS=$?
     fi
     
