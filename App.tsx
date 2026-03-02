@@ -241,7 +241,7 @@ const LoadingScreen: React.FC<{ onTimeout: () => void }> = ({ onTimeout }) => {
                 if (prev === 80) setMessage('生成专属穿搭与妆容建议...');
                 return prev + 1;
             });
-        }, 300); // 30s approximate total
+        }, 600); // 60s approximate total
 
         // 超时检测计时器（3分钟）
         const timeoutTimer = setTimeout(() => {
@@ -268,7 +268,7 @@ const LoadingScreen: React.FC<{ onTimeout: () => void }> = ({ onTimeout }) => {
             
             <h2 className="text-xl font-bold text-gray-800 mb-2">AI 深度分析中</h2>
             <p className="text-gray-500 animate-pulse text-sm">{message}</p>
-            <p className="text-gray-400 text-xs mt-4">预计需要 30 秒左右，请耐心等待 ⏳</p>
+            <p className="text-gray-400 text-xs mt-4">预计需要 60 秒左右，请耐心等待 ⏳</p>
             
             {isTimeout && (
                 <div className="mt-8 p-4 bg-red-50 rounded-lg border border-red-100 text-center">

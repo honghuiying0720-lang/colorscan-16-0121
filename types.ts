@@ -18,6 +18,13 @@ export interface ColorRecommendation {
   reason?: string;
 }
 
+export interface DetailedStylingTips {
+  fashion_matching: string;
+  celebrity_reference: string;
+  jewelry_colors: string;
+  makeup_details: string;
+}
+
 export interface AnalysisResult {
   season: 'spring' | 'summer' | 'autumn' | 'winter';
   subtype: string; // e.g., 'clear_spring'
@@ -30,7 +37,7 @@ export interface AnalysisResult {
   body_part_colors: BodyPartColor[];
   recommended_colors: ColorRecommendation[];
   avoid_colors: ColorRecommendation[];
-  detailed_styling_tips: string;
+  detailed_styling_tips: DetailedStylingTips | string;
   makeup_tips: string;
   styling_tips: string;
   star_reference?: string; // From the prompt requirements
