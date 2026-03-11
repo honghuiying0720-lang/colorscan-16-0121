@@ -1,7 +1,7 @@
 import { AnalysisResult } from "../types";
 
 // 通义千问 API Key
-const API_KEY = "sk-448e495aa67345399e51b2ad72b2d009";
+const API_KEY = "sk-9444b034b3124b7085b8dc137cac010f";
 const API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
 const MODEL = "qwen-vl-max-latest";
 
