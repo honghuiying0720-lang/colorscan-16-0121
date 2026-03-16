@@ -110,26 +110,35 @@ const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage:
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selected = e.target.files[0];
-      
-      if (selected.size > 5 * 1024 * 1024) {
-        alert("图片大小不能超过 5MB");
-        return;
-      }
-      
-      // 图片预处理：转换为 JPEG 格式，大小控制在 200-300KB
+
+      // 图片预处理：转换为 JPEG 格式，根据原始大小调整压缩质量
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
-      
+
       img.onload = () => {
         // 使用原始分辨率
         canvas.width = img.width;
         canvas.height = img.height;
-        
+
         // 绘制图片
         ctx?.drawImage(img, 0, 0, img.width, img.height);
-        
-        // 转换为 JPEG 格式，质量设为 0.6（控制大小在 200-300KB）
+
+        // 根据原始图片大小动态调整压缩质量
+        // 原图 > 5MB: 质量 0.4
+        // 原图 > 3MB: 质量 0.5
+        // 原图 > 1MB: 质量 0.6
+        // 原图 <= 1MB: 质量 0.8
+        let quality = 0.8;
+        if (selected.size > 5 * 1024 * 1024) {
+          quality = 0.4;
+        } else if (selected.size > 3 * 1024 * 1024) {
+          quality = 0.5;
+        } else if (selected.size > 1 * 1024 * 1024) {
+          quality = 0.6;
+        }
+
+        // 转换为 JPEG 格式
         canvas.toBlob((blob) => {
           if (blob) {
             // 创建新的 File 对象，使用 JPEG 格式
@@ -137,17 +146,17 @@ const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage:
               type: 'image/jpeg',
               lastModified: Date.now()
             });
-            
+
             setFile(jpegFile);
-            
+
             // 创建预览
             const reader = new FileReader();
             reader.onloadend = () => setPreview(reader.result as string);
             reader.readAsDataURL(jpegFile);
           }
-        }, 'image/jpeg', 0.6);
+        }, 'image/jpeg', quality);
       };
-      
+
       img.src = URL.createObjectURL(selected);
     }
   };
@@ -181,7 +190,7 @@ const UploadSection: React.FC<{ onAnalyze: (file: File) => void; remainingUsage:
                         </svg>
                     </div>
                     <p className="text-gray-500 text-sm font-medium">点击选择相册照片</p>
-                    <p className="text-gray-400 text-xs mt-2">支持 JPG, PNG (Max 5MB)<br/>建议自然光、无滤镜、素颜</p>
+                    <p className="text-gray-400 text-xs mt-2">支持 JPG, PNG (照片不超过 5MB)<br/>建议自然光、无滤镜、素颜</p>
                 </div>
               )}
               <input 
