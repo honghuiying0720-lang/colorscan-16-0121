@@ -1,9 +1,17 @@
 import { AnalysisResult } from "../types";
 
-// 通义千问 API Key
-const API_KEY = "sk-00e6d380f9644c2c9ab520ecb96084dd";
-const API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
-const MODEL = "qwen-vl-max-latest";
+// ==================== 模型切换开关（仅修改这里切换模型）====================
+// 可选值: "wenxin" | "tongyi"
+const ACTIVE_MODEL: "wenxin" | "tongyi" = "wenxin";
+
+// ========== 文心一言 ==========
+const WENXIN_API_URL = "https://api-integrations.appmiaoda.com/app-8wdw78z867ls/api-2jBYdN3A9Jyz/v2/chat/completions";
+const WENXIN_APP_ID = "app-8wdw78z867ls";
+
+// ========== 通义千问 ==========
+const TONGYI_API_KEY = "sk-00e6d380f9644c2c9ab520ecb96084dd";
+const TONGYI_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+const TONGYI_MODEL = "qwen-vl-max-latest";
 
 const SYSTEM_PROMPT = `
 你是一位拥有15年经验的专业色彩分析师，精通「四季16型」个人色彩理论。请严格按照以下三步算法分析这张人物照片。
@@ -314,38 +322,55 @@ const SYSTEM_PROMPT = `
 
 export const analyzeImage = async (base64Image: string): Promise<AnalysisResult> => {
   try {
-    // 使用通义千问的视觉理解 API
     const imageDataUrl = `data:image/jpeg;base64,${base64Image}`;
+    let response: Response;
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: SYSTEM_PROMPT,
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: imageDataUrl,
-                },
-              },
-            ],
-          },
-        ],
-        max_tokens: 4000,
-        temperature: 0.7,
-      }),
-    });
+    if (ACTIVE_MODEL === "wenxin") {
+      // ========== 文心一言调用 ==========
+      response = await fetch(WENXIN_API_URL, {        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-App-Id": WENXIN_APP_ID,
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: SYSTEM_PROMPT },
+                { type: "image_url", image_url: { url: imageDataUrl } },
+              ],
+            },
+          ],
+          max_tokens: 4000,
+          temperature: 0.7,
+          stream: false,
+        }),
+      });
+    } else {
+      // ========== 通义千问调用 ==========
+      response = await fetch(TONGYI_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${TONGYI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: TONGYI_MODEL,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: SYSTEM_PROMPT },
+                { type: "image_url", image_url: { url: imageDataUrl } },
+              ],
+            },
+          ],
+          max_tokens: 4000,
+          temperature: 0.7,
+        }),
+      });
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({
@@ -384,7 +409,7 @@ export const analyzeImage = async (base64Image: string): Promise<AnalysisResult>
     const result = JSON.parse(cleaned) as AnalysisResult;
     return result;
   } catch (error) {
-    console.error("Analysis Error (via 通义千问 API):", error);
+    console.error(`Analysis Error (via ${ACTIVE_MODEL === "wenxin" ? "文心一言" : "通义千问"}):`, error);
     throw error;
   }
 };
