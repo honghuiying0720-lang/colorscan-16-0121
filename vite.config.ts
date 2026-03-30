@@ -10,7 +10,6 @@ export default defineConfig(({ mode }) => {
         port: 3000,
         host: '0.0.0.0',
         proxy: {
-          // 把前端的 /api/v3/chat/completions 代理到真实模型服务，解决 404 和浏览器直连跨域问题
           '/api': {
             target: env.API_BASE_URL || 'https://ark.cn-beijing.volces.com',
             changeOrigin: true,
@@ -26,6 +25,16 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            // 给静态资源加 hash，文件名变化时强制重新加载
+            assetFileNames: 'assets/[name]-[hash][extname]',
+            chunkFileNames: 'assets/[name]-[hash].js',
+            entryFileNames: 'assets/[name]-[hash].js',
+          },
+        },
+      },
     };
 });
