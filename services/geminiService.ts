@@ -2,7 +2,7 @@ import { AnalysisResult } from "../types";
 
 // ==================== 模型切换开关（仅修改这里切换模型）====================
 // 可选值: "wenxin" | "tongyi"
-const ACTIVE_MODEL: "wenxin" | "tongyi" = "wenxin";
+const ACTIVE_MODEL: "wenxin" | "tongyi" = "tongyi";
 
 // ========== 文心一言 ==========
 const WENXIN_API_URL = "https://api-integrations.appmiaoda.com/app-8wdw78z867ls/api-2jBYdN3A9Jyz/v2/chat/completions";
@@ -327,7 +327,6 @@ export const analyzeImage = async (base64Image: string): Promise<AnalysisResult>
 
     if (ACTIVE_MODEL === "wenxin") {
       // ========== 文心一言调用 ==========
-      console.log("🚀 [geminiService] 调用模型: 文心一言, URL:", WENXIN_API_URL);
       response = await fetch(WENXIN_API_URL, {        method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -377,16 +376,13 @@ export const analyzeImage = async (base64Image: string): Promise<AnalysisResult>
       const errorData = await response.json().catch(() => ({
         message: `HTTP error! Status: ${response.status}`,
       }));
-      console.error("❌ [geminiService] 请求失败:", errorData);
       throw new Error(errorData.error?.message || `HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("✅ [geminiService] 响应成功, data.keys:", Object.keys(data));
 
     // 兼容不同返回结构，提取文本内容
     let content = data.choices?.[0]?.message?.content || "";
-    console.log("📄 [geminiService] content长度:", content.length);
 
     if (!content) {
       throw new Error("Empty content from AI response");
