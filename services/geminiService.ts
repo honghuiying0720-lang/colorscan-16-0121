@@ -2,7 +2,7 @@ import { AnalysisResult } from "../types";
 
 // ==================== 模型切换开关（仅修改这里切换模型）====================
 // 可选值: "wenxin" | "tongyi"
-const ACTIVE_MODEL: "wenxin" | "tongyi" = "wenxin";
+const ACTIVE_MODEL: "wenxin" | "tongyi" = "tongyi";
 
 // ========== 文心一言 ==========
 const WENXIN_API_URL = "https://api-integrations.appmiaoda.com/app-8wdw78z867ls/api-2jBYdN3A9Jyz/v2/chat/completions";
